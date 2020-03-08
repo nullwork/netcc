@@ -1,6 +1,6 @@
 # netcc
 A (C) compiler server, written in C, using libevent for HTTP I/O.
-Results are stored into (vault) a TC-style hash-table database.
+Results are stored into (vault) a TC-style key-value hash-table database.
 
 # Endpoints
 POST /              Server accepts C source code in this endpoint. The maximum code length is 4096 bytes. (hardcoded, for now). Responds with an error message, or with a link to the results.
@@ -16,3 +16,8 @@ A makefile is provided for building the program, dependencies are libevent and l
 
 # Running the server
 The binary is located in bin, and it will run listening on localhost:3000 (hardcoded, for now).
+
+# TODO
+- Database sequential access (for removing old entries)
+- Database cache
+- Database value compression
