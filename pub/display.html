@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>netcc</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Lato&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background: #82a9dc;
+        }
+
+        .container {
+            width: 960px;
+            margin: 2em auto;
+        }
+
+        .btn {
+            color: #fff;
+            font-family: Lato, sans-serif;
+            font-size: 18px;
+            padding: 10px 40px;
+            margin: 0 10 10 0;
+            text-decoration: none;
+            background-color: #3498db;
+            border-bottom: 5px solid #2980B9;
+            text-shadow: 0px -2px #2980B9;
+        }
+
+        .output {
+            width: 100%;
+            font-family: monospace;
+            font-size: 18px;
+            color: #000;
+            background: #fff;
+            border: 1px solid rgb(169, 169, 169);
+            padding: 2px 0 0 2px;
+            white-space: pre;
+        }
+
+        .mb-2 { margin-bottom: 1rem !important; }
+        .mb-4 { margin-bottom: 2rem !important; }
+        .text-center { text-align: center; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="output-wrapper">
+        <div id="source" class="output mb-2"></div>
+        <div id="compiler" class="output mb-2"></div>
+        <div id="stdout" class="output"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    var outputWrapper = document.getElementById("output-wrapper")
+    var sourceOutput = document.getElementById("source")
+    var compilerOutput = document.getElementById("compiler")
+    var stdoutOutput = document.getElementById("stdout")
+
+    function htmlEntities(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function getHandler() {
+        if (this.status == 200) {
+            var arr = this.responseText.split("\n", 4)
+            var status = parseInt(arr[0], 10)
+            var srcLen = parseInt(arr[1], 10)
+            var cmpLen = parseInt(arr[2], 10)
+            var stdoutLen = parseInt(arr[3], 10)
+
+            var n = arr[0].length + arr[1].length + arr[2].length + arr[3].length + 4;
+            var body = this.responseText.slice(n);
+
+            sourceOutput.innerHTML = htmlEntities(body.slice(0, srcLen))
+            compilerOutput.innerHTML = htmlEntities(body.slice(srcLen, srcLen+cmpLen))
+            stdoutOutput.innerHTML = htmlEntities(body.slice(srcLen+cmpLen, srcLen+cmpLen+stdoutLen))
+        } else {
+            console.log("(getHandler) Error code: " + this.status)
+        }
+    }
+
+    var xhr = new XMLHttpRequest()
+    var res = window.location.href.split("/")
+    console.log(res)
+    xhr.open("GET", "http://localhost:3000/api/" + res[res.length-1])
+    xhr.addEventListener("load", getHandler)
+    xhr.send()
+</script>
+</body>
+</html>
